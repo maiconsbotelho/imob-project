@@ -106,12 +106,12 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-900 font-medium mb-2">Nota:</p>
             <p className="text-sm text-blue-800">
               Certifique-se de ter um usuário criado no painel do Supabase Authentication.
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
