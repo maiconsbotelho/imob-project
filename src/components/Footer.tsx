@@ -134,7 +134,9 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} ImóvelPro. Todos os direitos reservados.</p>
+          <p>
+            © {new Date().getFullYear()} AltrenImóveis. Todos os direitos reservados. Desenvolvido por Maicon Botelho.
+          </p>
         </div>
       </div>
     </footer>
