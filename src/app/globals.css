@@ -183,3 +183,9 @@
     line-height: 1.5;
   }
 }
+
+@layer components {
+  .container {
+    max-width: 1320px !important;
+  }
+}
