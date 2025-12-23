@@ -157,6 +157,11 @@ export function PropertyForm({ initialData, onSuccess, onCancel }: PropertyFormP
                     <SelectItem value="casa">Casa</SelectItem>
                     <SelectItem value="apartamento">Apartamento</SelectItem>
                     <SelectItem value="terreno">Terreno</SelectItem>
+                    <SelectItem value="sobrado">Sobrado</SelectItem>
+                    <SelectItem value="sitio">Sítio</SelectItem>
+                    <SelectItem value="chacara">Chácara</SelectItem>
+                    <SelectItem value="comercial">Comercial</SelectItem>
+                    <SelectItem value="rural">Rural</SelectItem>
                   </SelectContent>
                 </Select>
               )}

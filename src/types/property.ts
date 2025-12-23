@@ -3,7 +3,7 @@ export interface Property {
   title: string;
   description: string;
   price: number;
-  type: 'casa' | 'apartamento' | 'terreno';
+  type: 'casa' | 'apartamento' | 'terreno' | 'sobrado' | 'sitio' | 'chacara' | 'comercial' | 'rural';
   status: 'venda' | 'aluguel';
   bedrooms: number;
   bathrooms: number;

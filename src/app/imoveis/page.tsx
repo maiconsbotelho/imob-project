@@ -3,14 +3,31 @@
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/contexts/PropertyContext";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
-export default function PropertyList() {
+function PropertyListContent() {
   const { properties } = useProperties();
+  const searchParams = useSearchParams();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("todos");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
+  const [filterPrice, setFilterPrice] = useState<string>("todos");
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const search = searchParams.get("search");
+    const type = searchParams.get("type");
+    const price = searchParams.get("price");
+
+    if (search) setSearchTerm(search);
+    if (type) setFilterType(type);
+    if (price) setFilterPrice(price);
+
+    // If any filter is active, show filters area (optional, but nice)
+    if (type || price) setShowFilters(true);
+  }, [searchParams]);
 
   const filteredProperties = properties.filter((property) => {
     const matchesSearch =
@@ -21,7 +38,21 @@ export default function PropertyList() {
     const matchesType = filterType === "todos" || property.type === filterType;
     const matchesStatus = filterStatus === "todos" || property.status === filterStatus;
 
-    return matchesSearch && matchesType && matchesStatus;
+    let matchesPrice = true;
+    if (filterPrice !== "todos") {
+      if (filterPrice === "low") {
+        // Até 500k
+        matchesPrice = property.price <= 500000;
+      } else if (filterPrice === "mid") {
+        // 500k - 1M
+        matchesPrice = property.price > 500000 && property.price <= 1000000;
+      } else if (filterPrice === "high") {
+        // Acima de 1M
+        matchesPrice = property.price > 1000000;
+      }
+    }
+
+    return matchesSearch && matchesType && matchesStatus && matchesPrice;
   });
 
   return (
@@ -52,7 +83,7 @@ export default function PropertyList() {
           </div>
 
           {showFilters && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Imóvel</label>
                 <select
@@ -64,6 +95,11 @@ export default function PropertyList() {
                   <option value="casa">Casa</option>
                   <option value="apartamento">Apartamento</option>
                   <option value="terreno">Terreno</option>
+                  <option value="sobrado">Sobrado</option>
+                  <option value="sitio">Sítio</option>
+                  <option value="chacara">Chácara</option>
+                  <option value="comercial">Comercial</option>
+                  <option value="rural">Rural</option>
                 </select>
               </div>
 
@@ -77,6 +113,20 @@ export default function PropertyList() {
                   <option value="todos">Todos</option>
                   <option value="venda">Venda</option>
                   <option value="aluguel">Aluguel</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Faixa de Preço</label>
+                <select
+                  value={filterPrice}
+                  onChange={(e) => setFilterPrice(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="todos">Todos</option>
+                  <option value="low">Até R$ 500k</option>
+                  <option value="mid">R$ 500k - R$ 1M</option>
+                  <option value="high">Acima de R$ 1M</option>
                 </select>
               </div>
             </div>
@@ -104,5 +154,13 @@ export default function PropertyList() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function PropertyList() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+      <PropertyListContent />
+    </Suspense>
   );
 }
