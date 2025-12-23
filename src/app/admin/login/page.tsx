@@ -151,12 +151,15 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-            <p className="text-xs text-gray-400">
-              &copy; {new Date().getFullYear()} Maicon Botelho. Todos os direitos reservados.
-              <br />
-              <span className="opacity-75">Sistema Seguro v1.0.0</span>
+          <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center justify-center gap-2">
+            <p className="text-xs text-gray-400 flex items-center gap-1.5">
+              <span>&copy; {new Date().getFullYear()} ImobSystem</span>
+              <span className="w-1 h-1 rounded-full bg-gray-300" />
+              <span>Dev Maicon Botelho</span>
             </p>
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
+              LTS v1.0.0
+            </span>
           </div>
         </div>
       </motion.div>

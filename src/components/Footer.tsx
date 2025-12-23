@@ -133,9 +133,18 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-          <p>
-            © {new Date().getFullYear()} AltrenImóveis. Todos os direitos reservados. Desenvolvido por Maicon Botelho.
+        <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left text-gray-500 text-sm">
+          <p>© {new Date().getFullYear()} Altren Imóveis. Todos os direitos reservados.</p>
+          <p className="flex items-center gap-1">
+            Desenvolvido por
+            <a
+              href="https://www.linkedin.com/in/maiconbotelho/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-400 transition-colors font-medium"
+            >
+              Maicon Botelho
+            </a>
           </p>
         </div>
       </div>
