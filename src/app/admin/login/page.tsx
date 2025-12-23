@@ -1,7 +1,9 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { AlertCircle, Building2, Loader2, Lock, Mail } from "lucide-react";
+import { motion } from "framer-motion";
+import { AlertCircle, ArrowLeft, Building2, Loader2, Lock, Mail } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -40,50 +42,86 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <Building2 className="h-8 w-8 text-blue-600" />
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 z-0" />
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-blue-200/20 rounded-full blur-3xl" />
+        <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-indigo-200/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-[10%] left-[20%] w-[30%] h-[30%] bg-sky-200/20 rounded-full blur-3xl" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md relative z-10"
+      >
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 md:p-10">
+          <div className="mb-8">
+            <Link
+              href="/"
+              className="inline-flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors mb-6 group"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+              Voltar ao site
+            </Link>
+
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2.5 bg-blue-600 rounded-xl shadow-lg shadow-blue-600/20">
+                <Building2 className="h-6 w-6 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Portal Admin</h1>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Área Administrativa</h1>
-            <p className="text-gray-600">Faça login para gerenciar os imóveis</p>
+            <p className="text-gray-500">Gerencie seus imóveis com segurança e agilidade.</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mb-6 p-4 bg-red-50/80 border border-red-100 rounded-xl flex items-start gap-3 backdrop-blur-sm"
+            >
               <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
+              <p className="text-sm text-red-800 font-medium">{error}</p>
+            </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 ml-1">
+                Email Corporativo
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                </div>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@imobiliaria.com"
+                  placeholder="seu@email.com"
                   required
                   disabled={loading}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-11 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-white"
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Senha
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 ml-1">
+                  Senha
+                </label>
+                <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+                  Esqueceu a senha?
+                </a>
+              </div>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                </div>
                 <input
                   id="password"
                   type="password"
@@ -92,7 +130,7 @@ export default function AdminLogin() {
                   placeholder="••••••••"
                   required
                   disabled={loading}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-11 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-white"
                 />
               </div>
             </div>
@@ -100,20 +138,28 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center py-3.5 px-4 border border-transparent rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium shadow-lg shadow-blue-600/30 hover:shadow-blue-600/40 transition-all disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Entrar"}
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                  Entrando...
+                </>
+              ) : (
+                "Acessar Painel"
+              )}
             </button>
           </form>
 
-          {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-900 font-medium mb-2">Nota:</p>
-            <p className="text-sm text-blue-800">
-              Certifique-se de ter um usuário criado no painel do Supabase Authentication.
+          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+            <p className="text-xs text-gray-400">
+              &copy; {new Date().getFullYear()} Maicon Botelho. Todos os direitos reservados.
+              <br />
+              <span className="opacity-75">Sistema Seguro v1.0.0</span>
             </p>
-          </div> */}
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
