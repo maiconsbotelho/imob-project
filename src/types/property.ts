@@ -13,6 +13,7 @@ export interface Property {
   city: string;
   state: string;
   images: string[];
+  videoUrl?: string;
   featured: boolean;
   createdAt: string;
 }

@@ -3,7 +3,6 @@
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Property } from "@/types/property";
 import { ArrowLeft, Bath, Bed, Car, Heart, Home, MapPin, Share2 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -37,7 +36,9 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
   const handleShare = async () => {
     const shareData = {
       title: property.title,
-      text: `🏠 *${property.title}*\n\n${property.description.substring(0, 100)}...\n\n📍 ${property.city} - ${property.state}\n💰 ${formatPrice(property.price)}\n\nVeja mais detalhes no link abaixo:`,
+      text: `🏠 *${property.title}*\n\n${property.description.substring(0, 100)}...\n\n📍 ${property.city} - ${
+        property.state
+      }\n💰 ${formatPrice(property.price)}\n\nVeja mais detalhes no link abaixo:`,
       url: window.location.href,
     };
 
@@ -62,6 +63,14 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
       minimumFractionDigits: 0,
     }).format(price);
   };
+
+  const getYouTubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const videoId = property.videoUrl ? getYouTubeId(property.videoUrl) : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -197,7 +206,22 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
 
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">Descrição</h2>
-                <p className="text-gray-700 leading-relaxed">{property.description}</p>
+                <p className="text-gray-700 leading-relaxed mb-8">{property.description}</p>
+
+                {videoId && (
+                  <div className="mt-8">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Vídeo do Imóvel</h2>
+                    <div className="relative pb-[56.25%] h-0 rounded-xl overflow-hidden bg-gray-100 shadow-sm">
+                      <iframe
+                        className="absolute top-0 left-0 w-full h-full"
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

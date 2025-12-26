@@ -233,7 +233,13 @@ export function PropertyForm({ initialData, onSuccess, onCancel }: PropertyFormP
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-medium">Outros</h3>
+        <h3 className="text-lg font-medium">Mídia e Destaque</h3>
+
+        <div className="space-y-2">
+          <Label htmlFor="videoUrl">URL do Vídeo (YouTube)</Label>
+          <Input id="videoUrl" {...register("videoUrl")} placeholder="https://www.youtube.com/watch?v=..." />
+          <p className="text-xs text-gray-500">Cole o link completo do vídeo do YouTube.</p>
+        </div>
 
         <div className="flex items-center space-x-2">
           <Controller
