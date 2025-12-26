@@ -69,10 +69,21 @@ export function PropertyForm({ initialData, onSuccess, onCancel }: PropertyFormP
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      setNewImages((prev) => [...prev, ...files]);
 
-      const newPreviews = files.map((file) => URL.createObjectURL(file));
-      setImagePreviews((prev) => [...prev, ...newPreviews]);
+      const validFiles = files.filter((file) => {
+        const isSizeValid = file.size <= 5 * 1024 * 1024; // 5MB limit
+        if (!isSizeValid) {
+          toast.error(`A imagem ${file.name} é muito grande. O tamanho máximo é 5MB.`);
+        }
+        return isSizeValid;
+      });
+
+      if (validFiles.length > 0) {
+        setNewImages((prev) => [...prev, ...validFiles]);
+
+        const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
+        setImagePreviews((prev) => [...prev, ...newPreviews]);
+      }
     }
   };
 

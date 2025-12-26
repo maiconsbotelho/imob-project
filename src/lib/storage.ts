@@ -3,7 +3,9 @@ import { supabase } from "./supabase";
 export const BUCKET_NAME = "property-images";
 
 export async function uploadPropertyImages(files: File[]): Promise<string[]> {
-  const uploadPromises = files.map(async (file) => {
+  const uploadedUrls: string[] = [];
+
+  for (const file of files) {
     const fileExt = file.name.split(".").pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     const filePath = `${fileName}`;
@@ -16,11 +18,10 @@ export async function uploadPropertyImages(files: File[]): Promise<string[]> {
     }
 
     const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath);
+    uploadedUrls.push(data.publicUrl);
+  }
 
-    return data.publicUrl;
-  });
-
-  return Promise.all(uploadPromises);
+  return uploadedUrls;
 }
 
 export async function deletePropertyImages(imageUrls: string[]) {

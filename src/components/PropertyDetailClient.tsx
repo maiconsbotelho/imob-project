@@ -2,9 +2,9 @@
 
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Property } from "@/types/property";
-import { ArrowLeft, Bath, Bed, Car, Heart, Home, MapPin, Share2 } from "lucide-react";
+import { ArrowLeft, Bath, Bed, Car, ChevronLeft, ChevronRight, Heart, Home, MapPin, Share2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface PropertyDetailClientProps {
   property: Property;
@@ -14,11 +14,65 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const fullscreenScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     setIsFavorite(favorites.includes(property.id));
   }, [property.id]);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const width = scrollContainerRef.current.offsetWidth;
+      // Check if we need to scroll (avoid conflict with user scrolling)
+      if (Math.abs(scrollContainerRef.current.scrollLeft - selectedImage * width) > 20) {
+        scrollContainerRef.current.scrollTo({
+          left: selectedImage * width,
+          behavior: "smooth",
+        });
+      }
+    }
+
+    if (fullscreenScrollRef.current) {
+      const width = fullscreenScrollRef.current.offsetWidth;
+      if (Math.abs(fullscreenScrollRef.current.scrollLeft - selectedImage * width) > 20) {
+        fullscreenScrollRef.current.scrollTo({
+          left: selectedImage * width,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [selectedImage, isFullScreen]);
+
+  useEffect(() => {
+    if (!isFullScreen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsFullScreen(false);
+      if (e.key === "ArrowLeft") handlePrevImage();
+      if (e.key === "ArrowRight") handleNextImage();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFullScreen]);
+
+  const handleThumbnailClick = (index: number) => {
+    // Check if mobile carousel is visible/active by checking offsetWidth
+    if (scrollContainerRef.current && scrollContainerRef.current.offsetWidth > 0) {
+      // Mobile behavior: Just scroll, let onScroll update the state to avoid race condition
+      const width = scrollContainerRef.current.offsetWidth;
+      scrollContainerRef.current.scrollTo({
+        left: index * width,
+        behavior: "smooth",
+      });
+    } else {
+      // Desktop behavior: Update state directly
+      setSelectedImage(index);
+    }
+  };
 
   const toggleFavorite = () => {
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -81,8 +135,72 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
     window.open(whatsappUrl, "_blank");
   };
 
+  const handleNextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedImage((prev) => (prev + 1) % property.images.length);
+  };
+
+  const handlePrevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedImage((prev) => (prev - 1 + property.images.length) % property.images.length);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Fullscreen Modal */}
+      {isFullScreen && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
+          <button
+            onClick={() => setIsFullScreen(false)}
+            className="absolute top-4 right-4 z-50 text-white/70 hover:text-white transition-colors p-2"
+          >
+            <X className="h-8 w-8" />
+          </button>
+
+          <button
+            onClick={handlePrevImage}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-white/70 hover:text-white transition-colors p-2 bg-black/50 rounded-full hover:bg-black/70"
+          >
+            <ChevronLeft className="h-8 w-8" />
+          </button>
+
+          <button
+            onClick={handleNextImage}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 text-white/70 hover:text-white transition-colors p-2 bg-black/50 rounded-full hover:bg-black/70"
+          >
+            <ChevronRight className="h-8 w-8" />
+          </button>
+
+          <div
+            ref={fullscreenScrollRef}
+            className="relative w-full h-full max-w-7xl max-h-[90vh] flex overflow-x-auto snap-x snap-mandatory scrollbar-hide z-40 items-center"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            onScroll={(e) => {
+              const scrollLeft = e.currentTarget.scrollLeft;
+              const width = e.currentTarget.offsetWidth;
+              const index = Math.round(scrollLeft / width);
+              if (index !== selectedImage && index >= 0 && index < property.images.length) {
+                setSelectedImage(index);
+              }
+            }}
+          >
+            {property.images.map((image, index) => (
+              <div key={index} className="min-w-full h-full flex items-center justify-center snap-center relative p-2">
+                <ImageWithFallback
+                  src={image}
+                  alt={`${property.title} - ${index + 1}`}
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+            ))}
+          </div>
+
+          <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/90 bg-black/50 px-4 py-2 rounded-full text-sm z-50">
+            {selectedImage + 1} / {property.images.length}
+          </p>
+        </div>
+      )}
+
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
           <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
@@ -95,28 +213,117 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
       <div className="container mx-auto px-4 py-8">
         {/* Image Gallery */}
         <div className="mb-8">
-          <div className="rounded-xl overflow-hidden mb-4">
-            <ImageWithFallback
-              src={property.images[selectedImage] || property.images[0]}
-              alt={property.title}
-              className="w-full h-64 sm:h-96 object-cover"
-            />
+          {/* Mobile Main Image (Carousel) */}
+          <div className="md:hidden relative mb-4">
+            <div
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide rounded-xl"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              onScroll={(e) => {
+                const scrollLeft = e.currentTarget.scrollLeft;
+                const width = e.currentTarget.offsetWidth;
+                const index = Math.round(scrollLeft / width);
+                if (index !== selectedImage && index >= 0 && index < property.images.length) {
+                  setSelectedImage(index);
+                }
+              }}
+            >
+              {property.images.map((image, index) => (
+                <div
+                  key={index}
+                  className="min-w-full snap-center relative aspect-video"
+                  onClick={() => setIsFullScreen(true)}
+                >
+                  <ImageWithFallback
+                    src={image}
+                    alt={`${property.title} - ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm">
+                    {index + 1} / {property.images.length}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
+          {/* Desktop Main Image & Thumbnails */}
+          <div className="hidden md:flex gap-4 h-[400px]">
+            <div className="flex-1 rounded-xl overflow-hidden relative group">
+              <ImageWithFallback
+                src={property.images[selectedImage] || property.images[0]}
+                alt={property.title}
+                className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                onClick={() => setIsFullScreen(true)}
+              />
+
+              {/* Navigation Arrows */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePrevImage(e);
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Imagem anterior"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNextImage(e);
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Próxima imagem"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span className="bg-black/50 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                  Ver em tela cheia
+                </span>
+              </div>
+            </div>
+
+            {/* Desktop Vertical Thumbnails */}
+            {property.images.length > 1 && (
+              <div className="w-[180px] flex flex-col gap-3 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                {property.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleThumbnailClick(index)}
+                    className={`shrink-0 rounded-lg overflow-hidden border-2 transition-all aspect-video relative ${
+                      selectedImage === index ? "border-blue-600" : "border-transparent"
+                    }`}
+                  >
+                    <ImageWithFallback
+                      src={image}
+                      alt={`${property.title} - ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Thumbnails */}
           {property.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
+            <div className="md:hidden flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide snap-x">
               {property.images.map((image, index) => (
                 <button
                   key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`rounded-lg overflow-hidden border-2 transition-all ${
+                  onClick={() => handleThumbnailClick(index)}
+                  className={`shrink-0 w-24 rounded-lg overflow-hidden border-2 transition-all aspect-video relative snap-start ${
                     selectedImage === index ? "border-blue-600" : "border-transparent"
                   }`}
                 >
                   <ImageWithFallback
                     src={image}
                     alt={`${property.title} - ${index + 1}`}
-                    className="w-full h-20 object-cover"
+                    className="w-full h-full object-cover"
                   />
                 </button>
               ))}
@@ -143,7 +350,14 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
               </div>
 
               <div className="flex justify-between items-start mb-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{property.title}</h1>
+                <div className="flex flex-col gap-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{property.title}</h1>
+                  {property.code && (
+                    <span className="inline-flex items-center w-fit bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium border border-gray-200 mt-1">
+                      Cód. Imóvel: {property.code}
+                    </span>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={toggleFavorite}
@@ -259,11 +473,6 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
               >
                 Agendar Visita
               </button>
-
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-600 mb-2">Código do Imóvel</p>
-                <p className="font-mono text-gray-900">#{property.code}</p>
-              </div>
             </div>
           </div>
         </div>
