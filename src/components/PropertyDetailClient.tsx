@@ -131,7 +131,7 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
       type === "visit" ? "Olá, gostaria de agendar uma visita para o imóvel" : "Olá, tenho interesse no imóvel";
 
     const message = `${prefix}: ${property.title} (Cód: ${property.code}) localizado em ${property.city}. Link: ${window.location.href}`;
-    const whatsappUrl = `https://wa.me/5551997979739?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 

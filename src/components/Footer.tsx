@@ -24,7 +24,7 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="https://www.instagram.com/altrenimoveis/"
+                href={process.env.NEXT_PUBLIC_INSTAGRAM_URL || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-gray-800 rounded-lg hover:bg-blue-600 transition-colors"
@@ -32,7 +32,7 @@ export function Footer() {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="https://www.facebook.com/altrenimoveisigrejinha"
+                href={process.env.NEXT_PUBLIC_FACEBOOK_URL || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-gray-800 rounded-lg hover:bg-blue-600 transition-colors"
@@ -40,7 +40,7 @@ export function Footer() {
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="https://wa.me/5551997979739"
+                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-gray-800 rounded-lg hover:bg-blue-600 transition-colors"
@@ -138,7 +138,7 @@ export function Footer() {
           <p className="flex items-center gap-1">
             Desenvolvido por
             <a
-              href="https://www.linkedin.com/in/maiconbotelho/"
+              href={process.env.NEXT_PUBLIC_DEVELOPER_LINKEDIN_URL || "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 hover:text-blue-400 transition-colors font-medium"
