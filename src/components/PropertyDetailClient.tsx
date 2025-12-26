@@ -35,19 +35,23 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
   };
 
   const handleShare = async () => {
+    const shareData = {
+      title: property.title,
+      text: `🏠 *${property.title}*\n\n${property.description.substring(0, 100)}...\n\n📍 ${property.city} - ${property.state}\n💰 ${formatPrice(property.price)}\n\nVeja mais detalhes no link abaixo:`,
+      url: window.location.href,
+    };
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: property.title,
-          text: `Confira este imóvel: ${property.title}`,
-          url: window.location.href,
-        });
+        await navigator.share(shareData);
       } catch (error) {
         console.log("Error sharing:", error);
       }
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link copiado para a área de transferência!");
+      // Fallback: Copy to clipboard with a nice message
+      const textToCopy = `${shareData.text}\n${shareData.url}`;
+      navigator.clipboard.writeText(textToCopy);
+      alert("Link e descrição copiados para a área de transferência!");
     }
   };
 

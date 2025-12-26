@@ -16,8 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ImóvelPro",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  title: {
+    default: "ImóvelPro",
+    template: "%s | ImóvelPro",
+  },
   description: "Encontre o imóvel dos seus sonhos",
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "ImóvelPro",
+  },
 };
 
 export default function RootLayout({
