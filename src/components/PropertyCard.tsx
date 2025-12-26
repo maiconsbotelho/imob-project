@@ -1,5 +1,6 @@
 import { Bath, Bed, Car, Heart, MapPin, Share2 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Property } from "../types/property";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Button } from "./ui/button";
@@ -9,6 +10,51 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    setIsFavorite(favorites.includes(property.id));
+  }, [property.id]);
+
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    if (favorites.includes(property.id)) {
+      const newFavorites = favorites.filter((id: string) => id !== property.id);
+      localStorage.setItem("favorites", JSON.stringify(newFavorites));
+      setIsFavorite(false);
+      // Optional: dispatch event to update other components listening to localstorage changes
+      window.dispatchEvent(new Event("storage"));
+    } else {
+      favorites.push(property.id);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      setIsFavorite(true);
+      window.dispatchEvent(new Event("storage"));
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.origin}/imoveis/${property.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: property.title,
+          text: `Confira este imóvel: ${property.title}`,
+          url: url,
+        });
+      } catch (error) {
+        console.log("Error sharing:", error);
+      }
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("Link copiado para a área de transferência!");
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -51,14 +97,18 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <Button
               size="icon"
               variant="secondary"
-              className="h-8 w-8 rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-red-500 shadow-sm"
+              className={`h-8 w-8 rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-red-500 shadow-sm ${
+                isFavorite ? "text-red-500" : ""
+              }`}
+              onClick={toggleFavorite}
             >
-              <Heart className="h-4 w-4" />
+              <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
             </Button>
             <Button
               size="icon"
               variant="secondary"
               className="h-8 w-8 rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-blue-500 shadow-sm"
+              onClick={handleShare}
             >
               <Share2 className="h-4 w-4" />
             </Button>

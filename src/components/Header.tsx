@@ -25,6 +25,7 @@ export function Header() {
   const navLinks = [
     { name: "Início", href: "/" },
     { name: "Imóveis", href: "/imoveis" },
+    { name: "Favoritos", href: "/favoritos" },
     { name: "Negocie seu Imóvel", href: "/negocie" },
     { name: "Sobre", href: "/sobre" },
     { name: "Contato", href: "/contato" },
