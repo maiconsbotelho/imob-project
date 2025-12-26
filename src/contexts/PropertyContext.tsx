@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { mockProperties } from "../data/mockProperties";
 import { supabase } from "../lib/supabase";
 import { Property } from "../types/property";
 import { useAuth } from "./AuthContext";
@@ -28,16 +27,14 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.from("properties").select("*").order("createdAt", { ascending: false });
 
       if (error) {
-        console.warn("Supabase fetch error, falling back to mock data:", error.message);
-        setProperties(mockProperties);
-      } else if (data && data.length > 0) {
-        setProperties(data as Property[]);
+        console.error("Supabase fetch error:", error.message);
+        setProperties([]);
       } else {
-        setProperties(mockProperties);
+        setProperties((data as Property[]) || []);
       }
     } catch (error) {
       console.error("Error fetching properties:", error);
-      setProperties(mockProperties);
+      setProperties([]);
     } finally {
       setLoading(false);
     }

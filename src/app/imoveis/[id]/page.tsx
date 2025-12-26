@@ -1,5 +1,4 @@
 import { PropertyDetailClient } from "@/components/PropertyDetailClient";
-import { mockProperties } from "@/data/mockProperties";
 import { supabase } from "@/lib/supabase";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -12,16 +11,15 @@ async function getProperty(id: string) {
   try {
     const { data, error } = await supabase.from("properties").select("*").eq("id", id).single();
 
-    if (error || !data) {
-      // Fallback to mock data if supabase fails or not found (e.g. dev environment without local db)
-      const mock = mockProperties.find((p) => p.id === id);
-      return mock || null;
+    if (error) {
+      console.error("Error fetching property:", error);
+      return null;
     }
 
     return data;
   } catch (error) {
     console.error("Error fetching property:", error);
-    return mockProperties.find((p) => p.id === id) || null;
+    return null;
   }
 }
 
