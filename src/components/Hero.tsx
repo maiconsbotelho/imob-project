@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { City } from "@/types/city";
+import { PriceRange, PropertyType } from "@/types/filters";
 import { ArrowRight, DollarSign, Home, MapPin, Search } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -18,13 +19,22 @@ export function Hero() {
   const [priceRange, setPriceRange] = useState("");
   const [code, setCode] = useState("");
   const [cities, setCities] = useState<City[]>([]);
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
+  const [priceRanges, setPriceRanges] = useState<PriceRange[]>([]);
 
   useEffect(() => {
-    async function getCities() {
-      const { data } = await supabase.from("cities").select("*").eq("active", true).order("name");
-      if (data) setCities(data);
+    async function fetchData() {
+      const [citiesResponse, typesResponse, pricesResponse] = await Promise.all([
+        supabase.from("cities").select("*").eq("active", true).order("name"),
+        supabase.from("property_types").select("*").eq("active", true).order("label"),
+        supabase.from("price_ranges").select("*").eq("active", true).order("min_price"),
+      ]);
+
+      if (citiesResponse.data) setCities(citiesResponse.data);
+      if (typesResponse.data) setPropertyTypes(typesResponse.data);
+      if (pricesResponse.data) setPriceRanges(pricesResponse.data);
     }
-    getCities();
+    fetchData();
   }, []);
 
   const handleSearch = () => {
@@ -138,14 +148,11 @@ export function Hero() {
                         <SelectValue placeholder="Tipo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="casa">Casa</SelectItem>
-                        <SelectItem value="apartamento">Apartamento</SelectItem>
-                        <SelectItem value="terreno">Terreno</SelectItem>
-                        <SelectItem value="sobrado">Sobrado</SelectItem>
-                        <SelectItem value="sitio">Sítio</SelectItem>
-                        <SelectItem value="chacara">Chácara</SelectItem>
-                        <SelectItem value="comercial">Comercial</SelectItem>
-                        <SelectItem value="rural">Rural</SelectItem>
+                        {propertyTypes.map((type) => (
+                          <SelectItem key={type.id} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -156,9 +163,11 @@ export function Hero() {
                         <SelectValue placeholder="Faixa de Preço" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Até R$ 500k</SelectItem>
-                        <SelectItem value="mid">R$ 500k - R$ 1M</SelectItem>
-                        <SelectItem value="high">Acima de R$ 1M</SelectItem>
+                        {priceRanges.map((range) => (
+                          <SelectItem key={range.id} value={range.value}>
+                            {range.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

@@ -2,7 +2,7 @@
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
-import { Building2, LayoutDashboard, LogOut, MapPin } from "lucide-react";
+import { Building2, DollarSign, Home, LayoutDashboard, LogOut, MapPin } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -28,35 +28,59 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Admin
             </h2>
           </div>
-          
+
           <nav className="px-4 space-y-2 mt-4">
-            <Link 
-              href="/admin/dashboard" 
+            <Link
+              href="/admin/dashboard"
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                isActive("/admin/dashboard") 
-                  ? "bg-blue-50 text-blue-600 font-semibold" 
+                isActive("/admin/dashboard")
+                  ? "bg-blue-50 text-blue-600 font-semibold"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
               <LayoutDashboard className="h-5 w-5" />
               Imóveis
             </Link>
-            
-            <Link 
-              href="/admin/cidades" 
+
+            <Link
+              href="/admin/cidades"
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                isActive("/admin/cidades") 
-                  ? "bg-blue-50 text-blue-600 font-semibold" 
+                isActive("/admin/cidades")
+                  ? "bg-blue-50 text-blue-600 font-semibold"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
               <MapPin className="h-5 w-5" />
               Cidades
             </Link>
+
+            <Link
+              href="/admin/tipos"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                isActive("/admin/tipos")
+                  ? "bg-blue-50 text-blue-600 font-semibold"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <Home className="h-5 w-5" />
+              Tipos
+            </Link>
+
+            <Link
+              href="/admin/precos"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                isActive("/admin/precos")
+                  ? "bg-blue-50 text-blue-600 font-semibold"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <DollarSign className="h-5 w-5" />
+              Preços
+            </Link>
           </nav>
 
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
-            <button 
+            <button
               onClick={logout}
               className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl w-full transition-colors font-medium"
             >
@@ -68,27 +92,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Mobile Header */}
         <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-20 px-4 py-3 flex justify-between items-center">
-             <h2 className="text-xl font-bold text-blue-600 flex items-center gap-2">
-              <Building2 className="h-6 w-6" />
-              Admin
-            </h2>
-            <div className="flex gap-4">
-               <Link href="/admin/dashboard" className={isActive("/admin/dashboard") ? "text-blue-600" : "text-gray-600"}>
-                  <LayoutDashboard className="h-6 w-6" />
-               </Link>
-               <Link href="/admin/cidades" className={isActive("/admin/cidades") ? "text-blue-600" : "text-gray-600"}>
-                  <MapPin className="h-6 w-6" />
-               </Link>
-               <button onClick={logout} className="text-red-600">
-                  <LogOut className="h-6 w-6" />
-               </button>
-            </div>
+          <h2 className="text-xl font-bold text-blue-600 flex items-center gap-2">
+            <Building2 className="h-6 w-6" />
+            Admin
+          </h2>
+          <div className="flex gap-4">
+            <Link href="/admin/dashboard" className={isActive("/admin/dashboard") ? "text-blue-600" : "text-gray-600"}>
+              <LayoutDashboard className="h-6 w-6" />
+            </Link>
+            <Link href="/admin/cidades" className={isActive("/admin/cidades") ? "text-blue-600" : "text-gray-600"}>
+              <MapPin className="h-6 w-6" />
+            </Link>
+            <Link href="/admin/tipos" className={isActive("/admin/tipos") ? "text-blue-600" : "text-gray-600"}>
+              <Home className="h-6 w-6" />
+            </Link>
+            <Link href="/admin/precos" className={isActive("/admin/precos") ? "text-blue-600" : "text-gray-600"}>
+              <DollarSign className="h-6 w-6" />
+            </Link>
+            <button onClick={logout} className="text-red-600">
+              <LogOut className="h-6 w-6" />
+            </button>
+          </div>
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 md:ml-64 p-4 md:p-8 mt-14 md:mt-0">
-          {children}
-        </main>
+        <main className="flex-1 md:ml-64 p-4 md:p-8 mt-14 md:mt-0">{children}</main>
       </div>
     </ProtectedRoute>
   );

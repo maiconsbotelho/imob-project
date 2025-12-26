@@ -8,9 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useProperties } from "@/contexts/PropertyContext";
 import { uploadPropertyImages } from "@/lib/storage";
+import { supabase } from "@/lib/supabase";
+import { PropertyType } from "@/types/filters";
 import { Property } from "@/types/property";
 import { Loader2, Upload, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -30,6 +32,15 @@ export function PropertyForm({ initialData, onSuccess, onCancel }: PropertyFormP
   const [existingImages, setExistingImages] = useState<string[]>(initialData?.images || []);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
+
+  useEffect(() => {
+    async function fetchTypes() {
+      const { data } = await supabase.from("property_types").select("*").eq("active", true).order("label");
+      if (data) setPropertyTypes(data);
+    }
+    fetchTypes();
+  }, []);
 
   const {
     register,

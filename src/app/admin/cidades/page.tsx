@@ -35,7 +35,7 @@ export default function AdminCities() {
 
   const toggleCity = async (city: City, checked: boolean) => {
     // Optimistic update
-    setCities(cities.map((c) => (c.id === city.id ? { ...c, active: checked } : c)));
+    setCities((prev) => prev.map((c) => (c.id === city.id ? { ...c, active: checked } : c)));
 
     try {
       const {
@@ -65,7 +65,7 @@ export default function AdminCities() {
       console.error("Error toggling city:", error);
       toast.error(error.message || "Erro ao atualizar cidade");
       // Revert optimistic update on error
-      setCities(cities.map((c) => (c.id === city.id ? { ...c, active: !checked } : c)));
+      setCities((prev) => prev.map((c) => (c.id === city.id ? { ...c, active: !checked } : c)));
     }
   };
 

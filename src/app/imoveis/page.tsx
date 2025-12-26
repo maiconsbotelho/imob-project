@@ -1,9 +1,11 @@
 "use client";
 
 import { PropertyCard } from "@/components/PropertyCard";
+
 import { useProperties } from "@/contexts/PropertyContext";
 import { supabase } from "@/lib/supabase";
 import { City } from "@/types/city";
+import { PriceRange, PropertyType } from "@/types/filters";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -20,13 +22,22 @@ function PropertyListContent() {
   const [filterCode, setFilterCode] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
   const [cities, setCities] = useState<City[]>([]);
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
+  const [priceRanges, setPriceRanges] = useState<PriceRange[]>([]);
 
   useEffect(() => {
-    async function getCities() {
-      const { data } = await supabase.from("cities").select("*").eq("active", true).order("name");
-      if (data) setCities(data);
+    async function fetchData() {
+      const [citiesResponse, typesResponse, pricesResponse] = await Promise.all([
+        supabase.from("cities").select("*").eq("active", true).order("name"),
+        supabase.from("property_types").select("*").eq("active", true).order("label"),
+        supabase.from("price_ranges").select("*").eq("active", true).order("min_price"),
+      ]);
+
+      if (citiesResponse.data) setCities(citiesResponse.data);
+      if (typesResponse.data) setPropertyTypes(typesResponse.data);
+      if (pricesResponse.data) setPriceRanges(pricesResponse.data);
     }
-    getCities();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -73,15 +84,15 @@ function PropertyListContent() {
 
     let matchesPrice = true;
     if (filterPrice !== "todos") {
-      if (filterPrice === "low") {
-        // Até 500k
-        matchesPrice = property.price <= 500000;
-      } else if (filterPrice === "mid") {
-        // 500k - 1M
-        matchesPrice = property.price > 500000 && property.price <= 1000000;
-      } else if (filterPrice === "high") {
-        // Acima de 1M
-        matchesPrice = property.price > 1000000;
+      const selectedRange = priceRanges.find((r) => r.value === filterPrice);
+      if (selectedRange) {
+        if (selectedRange.min_price !== null && selectedRange.max_price !== null) {
+          matchesPrice = property.price >= selectedRange.min_price && property.price <= selectedRange.max_price;
+        } else if (selectedRange.min_price !== null) {
+          matchesPrice = property.price >= selectedRange.min_price;
+        } else if (selectedRange.max_price !== null) {
+          matchesPrice = property.price <= selectedRange.max_price;
+        }
       }
     }
 
@@ -150,14 +161,11 @@ function PropertyListContent() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="todos">Todos</option>
-                  <option value="casa">Casa</option>
-                  <option value="apartamento">Apartamento</option>
-                  <option value="terreno">Terreno</option>
-                  <option value="sobrado">Sobrado</option>
-                  <option value="sitio">Sítio</option>
-                  <option value="chacara">Chácara</option>
-                  <option value="comercial">Comercial</option>
-                  <option value="rural">Rural</option>
+                  {propertyTypes.map((type) => (
+                    <option key={type.id} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -182,9 +190,11 @@ function PropertyListContent() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="todos">Todos</option>
-                  <option value="low">Até R$ 500k</option>
-                  <option value="mid">R$ 500k - R$ 1M</option>
-                  <option value="high">Acima de R$ 1M</option>
+                  {priceRanges.map((range) => (
+                    <option key={range.id} value={range.value}>
+                      {range.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
