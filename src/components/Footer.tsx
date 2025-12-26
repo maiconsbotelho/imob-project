@@ -97,24 +97,20 @@ export function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-gray-400">
                 <MapPin className="h-5 w-5 text-blue-500 shrink-0 mt-1" />
-                <span>
-                  Rua Gen. Ernesto Dornelles, 168
-                  <br />
-                  Centro, Igrejinha/RS
-                </span>
+                <span>{process.env.NEXT_PUBLIC_ENDERECO}</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400">
                 <Phone className="h-5 w-5 text-blue-500 shrink-0" />
-                <span>(51) 99797-9739</span>
+                <span>{process.env.NEXT_PUBLIC_TELEFONE}</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400">
                 <Mail className="h-5 w-5 text-blue-500 shrink-0" />
-                <span>altrenimoveis@gmail.com</span>
+                <span>{process.env.NEXT_PUBLIC_EMAIL}</span>
               </li>
             </ul>
             <div className="mt-6 text-gray-400 text-sm space-y-1">
-              <p>CNPJ: 39.286.085/0001-51</p>
-              <p>CRECI-RS 25793 J</p>
+              <p>CNPJ: {process.env.NEXT_PUBLIC_CNPJ}</p>
+              <p>{process.env.NEXT_PUBLIC_CRECI}</p>
             </div>
           </div>
 
