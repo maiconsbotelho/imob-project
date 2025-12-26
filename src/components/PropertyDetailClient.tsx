@@ -72,6 +72,15 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
 
   const videoId = property.videoUrl ? getYouTubeId(property.videoUrl) : null;
 
+  const handleContact = (type: "interest" | "visit") => {
+    const prefix =
+      type === "visit" ? "Olá, gostaria de agendar uma visita para o imóvel" : "Olá, tenho interesse no imóvel";
+
+    const message = `${prefix}: ${property.title} (Cód: ${property.code}) localizado em ${property.city}. Link: ${window.location.href}`;
+    const whatsappUrl = `https://wa.me/5551997979739?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">
@@ -237,11 +246,17 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
                 </p>
               </div>
 
-              <button className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold mb-3">
+              <button
+                onClick={() => handleContact("interest")}
+                className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold mb-3"
+              >
                 Tenho Interesse
               </button>
 
-              <button className="w-full py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-semibold">
+              <button
+                onClick={() => handleContact("visit")}
+                className="w-full py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+              >
                 Agendar Visita
               </button>
 
