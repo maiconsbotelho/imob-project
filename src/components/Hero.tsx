@@ -1,25 +1,41 @@
 "use client";
 
+import { supabase } from "@/lib/supabase";
+import { City } from "@/types/city";
 import { ArrowRight, DollarSign, Home, MapPin, Search } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 export function Hero() {
   const router = useRouter();
-  const [location, setLocation] = useState("");
+  const [city, setCity] = useState("");
   const [type, setType] = useState("");
   const [priceRange, setPriceRange] = useState("");
+  const [code, setCode] = useState("");
+  const [cities, setCities] = useState<City[]>([]);
+
+  useEffect(() => {
+    async function getCities() {
+      const { data } = await supabase.from("cities").select("*").eq("active", true).order("name");
+      if (data) setCities(data);
+    }
+    getCities();
+  }, []);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (location) params.append("search", location);
+    if (city && city !== "all") params.append("city", city);
     if (type) params.append("type", type);
     if (priceRange) params.append("price", priceRange);
+    if (code) {
+      const sanitizedCode = code.replace(/[^0-9]/g, "");
+      if (sanitizedCode) params.append("code", sanitizedCode);
+    }
 
     router.push(`/imoveis?${params.toString()}`);
   };
@@ -88,20 +104,37 @@ export function Hero() {
 
               <div className="space-y-4">
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 z-10" />
                   <Input
-                    placeholder="Cidade ou Bairro"
-                    className="h-12 pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400 focus-visible:ring-blue-500/50"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Código do imóvel (ex: 123)"
+                    className="h-12 pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-200 focus-visible:ring-blue-500/50"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
                   />
+                </div>
+
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 z-10" />
+                  <Select value={city} onValueChange={setCity}>
+                    <SelectTrigger className="!h-12 pl-10 bg-white/5 border-white/10 text-white data-[placeholder]:text-gray-200 focus-visible:ring-blue-500/50">
+                      <SelectValue placeholder="Selecione a cidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas as cidades</SelectItem>
+                      {cities.map((city) => (
+                        <SelectItem key={city.id} value={city.name}>
+                          {city.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
                     <Home className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 z-10" />
                     <Select value={type} onValueChange={setType}>
-                      <SelectTrigger className="h-12 pl-10 bg-white/5 border-white/10 text-gray-400 hover:text-white focus:ring-blue-500/50">
+                      <SelectTrigger className="!h-12 pl-10 bg-white/5 border-white/10 text-white data-[placeholder]:text-gray-200 focus-visible:ring-blue-500/50">
                         <SelectValue placeholder="Tipo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -119,7 +152,7 @@ export function Hero() {
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 z-10" />
                     <Select value={priceRange} onValueChange={setPriceRange}>
-                      <SelectTrigger className="h-12 pl-10 bg-white/5 border-white/10 text-gray-400 hover:text-white focus:ring-blue-500/50">
+                      <SelectTrigger className="!h-12 pl-10 bg-white/5 border-white/10 text-white data-[placeholder]:text-gray-200 focus-visible:ring-blue-500/50">
                         <SelectValue placeholder="Faixa de Preço" />
                       </SelectTrigger>
                       <SelectContent>

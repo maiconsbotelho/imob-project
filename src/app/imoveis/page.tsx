@@ -2,6 +2,8 @@
 
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/contexts/PropertyContext";
+import { supabase } from "@/lib/supabase";
+import { City } from "@/types/city";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -14,26 +16,57 @@ function PropertyListContent() {
   const [filterType, setFilterType] = useState<string>("todos");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
   const [filterPrice, setFilterPrice] = useState<string>("todos");
+  const [filterCity, setFilterCity] = useState<string>("todos");
+  const [filterCode, setFilterCode] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
+  const [cities, setCities] = useState<City[]>([]);
+
+  useEffect(() => {
+    async function getCities() {
+      const { data } = await supabase.from("cities").select("*").eq("active", true).order("name");
+      if (data) setCities(data);
+    }
+    getCities();
+  }, []);
 
   useEffect(() => {
     const search = searchParams.get("search");
+    const city = searchParams.get("city");
     const type = searchParams.get("type");
     const price = searchParams.get("price");
+    const code = searchParams.get("code");
 
     if (search) setSearchTerm(search);
+    if (city) setFilterCity(city);
     if (type) setFilterType(type);
     if (price) setFilterPrice(price);
+    if (code) setFilterCode(code);
 
-    // If any filter is active, show filters area (optional, but nice)
-    if (type || price) setShowFilters(true);
+    if (type || price || city || code) setShowFilters(true);
   }, [searchParams]);
 
   const filteredProperties = properties.filter((property) => {
-    const matchesSearch =
-      property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.address.toLowerCase().includes(searchTerm.toLowerCase());
+    // Code Filter
+    if (filterCode) {
+      const sanitizedFilterCode = filterCode.replace(/[^0-9]/g, ""); // Remove non-numeric characters like '#'
+      if (sanitizedFilterCode && !property.code?.toString().includes(sanitizedFilterCode)) {
+        return false;
+      }
+    }
+
+    // City Filter
+    if (filterCity !== "todos" && property.city !== filterCity) {
+      return false;
+    }
+
+    // Generic Search
+    if (searchTerm) {
+      const matchesSearch =
+        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.address.toLowerCase().includes(searchTerm.toLowerCase());
+
+      if (!matchesSearch) return false;
+    }
 
     const matchesType = filterType === "todos" || property.type === filterType;
     const matchesStatus = filterStatus === "todos" || property.status === filterStatus;
@@ -52,7 +85,7 @@ function PropertyListContent() {
       }
     }
 
-    return matchesSearch && matchesType && matchesStatus && matchesPrice;
+    return matchesType && matchesStatus && matchesPrice;
   });
 
   return (
@@ -67,10 +100,19 @@ function PropertyListContent() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Buscar por cidade, endereço ou título..."
+                placeholder="Buscar por endereço ou título..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="relative w-full sm:w-48">
+              <input
+                type="text"
+                placeholder="Cód. Imóvel"
+                value={filterCode}
+                onChange={(e) => setFilterCode(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
@@ -83,7 +125,23 @@ function PropertyListContent() {
           </div>
 
           {showFilters && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cidade</label>
+                <select
+                  value={filterCity}
+                  onChange={(e) => setFilterCity(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="todos">Todas</option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Imóvel</label>
                 <select

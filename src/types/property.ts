@@ -1,10 +1,11 @@
 export interface Property {
   id: string;
+  code: number;
   title: string;
   description: string;
   price: number;
-  type: 'casa' | 'apartamento' | 'terreno' | 'sobrado' | 'sitio' | 'chacara' | 'comercial' | 'rural';
-  status: 'venda' | 'aluguel';
+  type: "casa" | "apartamento" | "terreno" | "sobrado" | "sitio" | "chacara" | "comercial" | "rural";
+  status: "venda" | "aluguel";
   bedrooms: number;
   bathrooms: number;
   area: number;

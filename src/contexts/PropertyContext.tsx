@@ -8,7 +8,7 @@ import { useAuth } from "./AuthContext";
 interface PropertyContextType {
   properties: Property[];
   loading: boolean;
-  addProperty: (property: Omit<Property, "id" | "createdAt">) => Promise<void>;
+  addProperty: (property: Omit<Property, "id" | "code" | "createdAt">) => Promise<void>;
   updateProperty: (id: string, property: Partial<Property>) => Promise<void>;
   deleteProperty: (id: string) => Promise<void>;
   getPropertyById: (id: string) => Property | undefined;
@@ -44,7 +44,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
     fetchProperties();
   }, []);
 
-  const addProperty = async (property: Omit<Property, "id" | "createdAt">) => {
+  const addProperty = async (property: Omit<Property, "id" | "code" | "createdAt">) => {
     try {
       if (!session) {
         throw new Error("Usuário não autenticado. Faça login para adicionar imóveis.");

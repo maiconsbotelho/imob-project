@@ -247,7 +247,7 @@ export function PropertyDetailClient({ property }: PropertyDetailClientProps) {
 
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <p className="text-sm text-gray-600 mb-2">Código do Imóvel</p>
-                <p className="font-mono text-gray-900">#{property.id}</p>
+                <p className="font-mono text-gray-900">#{property.code}</p>
               </div>
             </div>
           </div>

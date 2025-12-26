@@ -11,6 +11,7 @@ datasource db {
 
 model Property {
   id          String         @id @default(uuid())
+  code        Int            @unique @default(dbgenerated("nextval('properties_code_seq')"))
   title       String
   description String
   price       Float

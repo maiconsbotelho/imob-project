@@ -20,7 +20,7 @@ interface PropertyFormProps {
   onCancel: () => void;
 }
 
-interface PropertyFormData extends Omit<Property, "id" | "createdAt" | "images"> {
+interface PropertyFormData extends Omit<Property, "id" | "code" | "createdAt" | "images"> {
   images: File[];
 }
 
