@@ -17,7 +17,10 @@ export default function AdminCities() {
   const fetchCities = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("cities").select("*").order("name");
+      const { data, error } = await supabase
+        .from("cities")
+        .select("*")
+        .order("name");
 
       if (error) throw error;
       setCities(data || []);
@@ -35,7 +38,9 @@ export default function AdminCities() {
 
   const toggleCity = async (city: City, checked: boolean) => {
     // Optimistic update
-    setCities((prev) => prev.map((c) => (c.id === city.id ? { ...c, active: checked } : c)));
+    setCities((prev) =>
+      prev.map((c) => (c.id === city.id ? { ...c, active: checked } : c))
+    );
 
     try {
       const {
@@ -65,7 +70,9 @@ export default function AdminCities() {
       console.error("Error toggling city:", error);
       toast.error(error.message || "Erro ao atualizar cidade");
       // Revert optimistic update on error
-      setCities((prev) => prev.map((c) => (c.id === city.id ? { ...c, active: !checked } : c)));
+      setCities((prev) =>
+        prev.map((c) => (c.id === city.id ? { ...c, active: !checked } : c))
+      );
     }
   };
 
@@ -123,11 +130,15 @@ export default function AdminCities() {
       // For simplicity and to ensure RLS policies, we'll iterate for now, but in production a bulk RPC is better.
       // Or we can use `upsert` if we include all required fields.
 
-      const { error } = await supabase.from("cities").upsert(updates, { onConflict: "id" });
+      const { error } = await supabase
+        .from("cities")
+        .upsert(updates, { onConflict: "id" });
 
       if (error) throw error;
 
-      toast.success(checked ? "Todas as cidades ativadas" : "Todas as cidades desativadas");
+      toast.success(
+        checked ? "Todas as cidades ativadas" : "Todas as cidades desativadas"
+      );
     } catch (error) {
       console.error("Error toggling all cities:", error);
       toast.error("Erro ao atualizar cidades");
@@ -139,21 +150,30 @@ export default function AdminCities() {
 
   const areAllChecked = cities.length > 0 && cities.every((c) => c.active);
 
-  const filteredCities = cities.filter((city) => city.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredCities = cities.filter((city) =>
+    city.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="container mx-auto max-w-4xl">
+    <div className="container mx-auto max-w-4xl pb-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gerenciar Cidades</h1>
-          <p className="text-gray-600">Configure as cidades disponíveis no filtro de busca</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Gerenciar Cidades
+          </h1>
+          <p className="text-gray-600">
+            Configure as cidades disponíveis no filtro de busca
+          </p>
         </div>
       </div>
 
       {/* Add City Form */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-semibold mb-4">Adicionar Nova Cidade</h3>
-        <form onSubmit={handleAddCity} className="flex gap-4">
+        <form
+          onSubmit={handleAddCity}
+          className="flex flex-col sm:flex-row gap-4"
+        >
           <input
             type="text"
             value={newCityName}
@@ -164,9 +184,13 @@ export default function AdminCities() {
           <button
             type="submit"
             disabled={adding || !newCityName.trim()}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+            className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
           >
-            {adding ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}
+            {adding ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Plus className="h-5 w-5" />
+            )}
             Adicionar
           </button>
         </form>
@@ -197,15 +221,23 @@ export default function AdminCities() {
         ) : (
           <div className="divide-y divide-gray-100">
             {filteredCities.map((city) => (
-              <div key={city.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              <div
+                key={city.id}
+                className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-center gap-4">
                   <Checkbox
                     id={`city-${city.id}`}
                     checked={!!city.active}
-                    onCheckedChange={(checked) => toggleCity(city, checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      toggleCity(city, checked as boolean)
+                    }
                     className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 z-10"
                   />
-                  <label htmlFor={`city-${city.id}`} className="font-medium text-gray-700 cursor-pointer select-none">
+                  <label
+                    htmlFor={`city-${city.id}`}
+                    className="font-medium text-gray-700 cursor-pointer select-none"
+                  >
                     {city.name} - {city.state}
                   </label>
                 </div>
@@ -220,7 +252,9 @@ export default function AdminCities() {
             ))}
 
             {filteredCities.length === 0 && (
-              <div className="p-8 text-center text-gray-500">Nenhuma cidade encontrada</div>
+              <div className="p-8 text-center text-gray-500">
+                Nenhuma cidade encontrada
+              </div>
             )}
           </div>
         )}

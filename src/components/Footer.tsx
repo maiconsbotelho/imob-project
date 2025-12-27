@@ -3,24 +3,35 @@
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
 export function Footer() {
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith("/admin");
+
   return (
-    <footer className="bg-gray-900 text-white pt-16 pb-8">
+    <footer
+      className={`bg-gray-900 text-white pt-16 pb-8 ${isAdmin ? "hidden" : ""}`}
+    >
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand Info */}
           <div>
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="relative h-36 md:h-20 w-40">
-                <Image src="/logo-branco.png" alt="ImóvelPro" fill className="object-contain object-left" />
+                <Image
+                  src="/logo-branco.png"
+                  alt="ImóvelPro"
+                  fill
+                  className="object-contain object-left"
+                />
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-6">
-              Transformando o mercado imobiliário com inovação, transparência e tecnologia. Encontre seu lugar no mundo
-              com a gente.
+              Transformando o mercado imobiliário com inovação, transparência e
+              tecnologia. Encontre seu lugar no mundo com a gente.
             </p>
             <div className="flex gap-4">
               <a
@@ -69,22 +80,34 @@ export function Footer() {
             <h3 className="font-bold text-lg mb-6">Links Rápidos</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/imoveis" className="text-gray-400 hover:text-white transition-colors">
+                <Link
+                  href="/imoveis"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Buscar Imóveis
                 </Link>
               </li>
               <li>
-                <Link href="/sobre" className="text-gray-400 hover:text-white transition-colors">
+                <Link
+                  href="/sobre"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Sobre Nós
                 </Link>
               </li>
               <li>
-                <Link href="/contato" className="text-gray-400 hover:text-white transition-colors">
+                <Link
+                  href="/contato"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Fale Conosco
                 </Link>
               </li>
               <li>
-                <Link href="/politica-privacidade" className="text-gray-400 hover:text-white transition-colors">
+                <Link
+                  href="/politica-privacidade"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Política de Privacidade
                 </Link>
               </li>
@@ -117,20 +140,27 @@ export function Footer() {
           {/* Newsletter */}
           <div>
             <h3 className="font-bold text-lg mb-6">Newsletter</h3>
-            <p className="text-gray-400 mb-4">Receba as melhores ofertas e novidades do mercado imobiliário.</p>
+            <p className="text-gray-400 mb-4">
+              Receba as melhores ofertas e novidades do mercado imobiliário.
+            </p>
             <div className="space-y-3">
               <Input
                 type="email"
                 placeholder="Seu melhor e-mail"
                 className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
               />
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 font-semibold">Inscrever-se</Button>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 font-semibold">
+                Inscrever-se
+              </Button>
             </div>
           </div>
         </div>
 
         <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} Altren Imóveis. Todos os direitos reservados.</p>
+          <p>
+            © {new Date().getFullYear()} Altren Imóveis. Todos os direitos
+            reservados.
+          </p>
           <p className="flex items-center gap-1">
             Desenvolvido por
             <a
